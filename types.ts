@@ -12,7 +12,9 @@ export type ActiveView =
   | 'report-ecommerce'
   | 'report-kol'
   | 'report-publishers'
-  | 'report-offline-media';
+  | 'report-offline-media'
+  | 'report-competitor-benchmarking'
+  | 'report-social-listening';
 
 export type RoleId = 'c-level' | 'director' | 'manager' | 'analyst';
 
@@ -189,7 +191,6 @@ export interface DashboardData {
     topKeywords: any[];
     socialMediaMetrics: Metric[];
     followerGrowthData: any[];
-    topPosts: any[];
     ecommerceMetrics: Metric[];
     salesOverTimeData: any[];
     topSellingProducts: any[];
@@ -199,6 +200,15 @@ export interface DashboardData {
     kols: KOL[];
     publishers: Publisher[];
     offlineCampaigns: OfflineCampaign[];
+    competitorBenchmarkingMetrics: Metric[];
+    socialMediaContentPerformanceMetrics: Metric[];
+    socialMediaCompetitionMetrics: Metric[];
+    socialMediaCompetitionChart: { competitor: string; sov: number; engagementRate: number; followerGrowth: number }[];
+    socialMediaContentPerformance: Metric[];
+    topPosts: { title: string; engagement: number }[];
+    videoCompletionTrend: { week: string; completionRate: number }[];
+    socialListeningMetrics: Metric[];
+    sentimentTrend: { week: string; positive: number; neutral: number; negative: number }[];
 }
 
 export type AllBrandsData = Record<Brand, DashboardData>;

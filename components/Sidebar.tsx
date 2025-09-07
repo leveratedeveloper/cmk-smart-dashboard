@@ -1,7 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
+import type { User } from '@supabase/supabase-js';
 import { HomeIcon, ReportsIcon, ChatLogsIcon, SettingsIcon, ChevronDownIcon, ChevronsLeftIcon } from './icons';
 import type { ActiveView } from '../types';
+import { mockRoles, mockUsers } from '../data/mockData';
 
 interface NavItemProps {
   icon: React.ReactNode;
@@ -33,9 +35,10 @@ interface SidebarProps {
   setActiveView: (view: ActiveView) => void;
   isCollapsed: boolean;
   onToggleCollapse: () => void;
+  user: User;
 }
 
-const reportLinks: { label: string; view: ActiveView }[] = [
+const allReportLinks: { label: string; view: ActiveView }[] = [
     { label: 'Paid Media', view: 'report-paid-media' },
     { label: 'Organic Search', view: 'report-organic-search' },
     { label: 'Social Media', view: 'report-social-media' },
@@ -43,10 +46,18 @@ const reportLinks: { label: string; view: ActiveView }[] = [
     { label: 'KOL', view: 'report-kol' },
     { label: 'Publishers', view: 'report-publishers' },
     { label: 'Offline Media', view: 'report-offline-media' },
+    { label: 'Competitor Benchmarking', view: 'report-competitor-benchmarking' },
+    { label: 'Social Listening', view: 'report-social-listening' }
 ];
 
-const Sidebar: React.FC<SidebarProps> = ({ activeView, setActiveView, isCollapsed, onToggleCollapse }) => {
+const Sidebar: React.FC<SidebarProps> = ({ activeView, setActiveView, isCollapsed, onToggleCollapse, user }) => {
     const [reportsOpen, setReportsOpen] = useState(activeView.startsWith('report-'));
+
+    const currentUser = mockUsers.find(u => u.email === user.email);
+    const userRole = mockRoles.find(r => r.id === currentUser?.roleId);
+    const allowedReports = userRole?.permissions.allowedReports || [];
+
+    const reportLinks = allReportLinks.filter(link => allowedReports.includes(link.view));
 
     useEffect(() => {
         if (isCollapsed) {

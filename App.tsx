@@ -23,6 +23,8 @@ import EcommerceReport from './components/reports/EcommerceReport';
 import KOLReport from './components/reports/KOLReport';
 import PublishersReport from './components/reports/PublishersReport';
 import OfflineMediaReport from './components/reports/OfflineMediaReport';
+import CompetitorBenchmarkingReport from './components/reports/CompetitorBenchmarkingReport';
+import SocialListeningReport from './components/reports/SocialListeningReport';
 
 interface AppProps {
     onLogout: () => void;
@@ -275,6 +277,12 @@ const App: React.FC<AppProps> = ({ onLogout, user }) => {
             case 'report-offline-media':
                 content = <OfflineMediaReport {...reportProps} />;
                 break;
+            case 'report-competitor-benchmarking':
+                content = <CompetitorBenchmarkingReport {...reportProps} />;
+                break;
+            case 'report-social-listening':
+                content = <SocialListeningReport {...reportProps} />;
+                break;
             default:
                 content = <Dashboard selectedBrand={selectedBrand} onAiPrompt={handleAiPrompt} isAiLoading={isAiLoading} aiConversation={aiConversation} />;
         }
@@ -290,6 +298,7 @@ const App: React.FC<AppProps> = ({ onLogout, user }) => {
                 setActiveView={setActiveView} 
                 isCollapsed={isSidebarCollapsed}
                 onToggleCollapse={() => setSidebarCollapsed(!isSidebarCollapsed)}
+                user={user}
             />
             <div className={`flex flex-1 flex-col overflow-hidden transition-all duration-300 ${isAiSidebarOpen ? 'pr-[500px]' : 'pr-0'}`}>
                 {activeView !== 'chatLogs' && activeView !== 'settings' && (
