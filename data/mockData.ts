@@ -1,340 +1,1061 @@
-import type { Brand, AllBrandsData, DashboardData, UserRole, User } from '../types';
+import type {
+  Brand,
+  AllBrandsData,
+  DashboardData,
+  UserRole,
+  User,
+} from "../types";
 
 // A factory function to create varied data for each brand
 const createBrandData = (brandName: Brand): DashboardData => {
-    const baseRevenue = { 'Frank & Co': 1248560, 'The Palace': 2500000, 'Mondial': 1800000, 'LakuEmas': 950000 }[brandName];
-    const multiplier = baseRevenue / 1248560;
+  const baseRevenue = {
+    "Frank & Co": 1248560,
+    "The Palace": 2500000,
+    Mondial: 1800000,
+    LakuEmas: 950000,
+  }[brandName];
+  const multiplier = baseRevenue / 1248560;
 
-    return {
-        executiveMetrics: [
-            // { title: 'Revenue', value: 'Rp49,037,642,158', change: '-', isPositive: true, period: 'from previous year', tooltip: 'Total revenue generated.' },
-            // { title: 'ROAS', value: '6.37', change: '-', isPositive: true, period: 'from previous year', tooltip: 'Return on Ad Spend.' },
-            // { title: 'Purchases', value: '1,022', change: '-', isPositive: true, period: 'from previous year', tooltip: 'Total purchases attributed.' },
-            // { title: 'Average Transaction Value (ATV)', value: 'Rp47,982,037', change: '-', isPositive: true, period: 'from previous year', tooltip: 'Average value per purchase.' },
-        ],
-        secondaryMetrics: [
-            { title: 'Amount Spent', value: 'Rp7,702,138,855', change: '-', isPositive: false, period: 'from previous year', tooltip: 'Total ad spend.' },
-            { title: 'Impressions', value: '1,879,760,492', change: '-', isPositive: true, period: 'from previous year', tooltip: 'Total ad impressions.' },
-            { title: 'CPM', value: 'Rp4,097', change: '-', isPositive: false, period: 'from previous year', tooltip: 'Cost per 1,000 impressions.' },
-            { title: 'Store Visits', value: '140,070', change: '-', isPositive: true, period: 'from previous year', tooltip: 'Store visits attributed.' },
-            { title: 'Cost per Store Visit', value: 'Rp54,988', change: '-', isPositive: false, period: 'from previous year', tooltip: 'Average cost per store visit.' },
-            { title: 'Leads (Website)', value: '175,198', change: '-', isPositive: true, period: 'from previous year', tooltip: 'Total website leads captured.' },
-            { title: 'CPL (Website)', value: 'Rp43,962', change: '-', isPositive: false, period: 'from previous year', tooltip: 'Cost per website lead.' },
-        ],
-        revenueByChannelData: [
-            { name: 'Paid Media', value: Math.round(498240 * multiplier), color: '#0ea5e9', revenue: `$${Math.round(498240 * multiplier).toLocaleString()}` },
-            { name: 'Organic Search', value: Math.round(385420 * multiplier), color: '#3b82f6', revenue: `$${Math.round(385420 * multiplier).toLocaleString()}` },
-            { name: 'Social Media', value: Math.round(189560 * multiplier), color: '#10b981', revenue: `$${Math.round(189560 * multiplier).toLocaleString()}` },
-            { name: 'Direct', value: Math.round(175340 * multiplier), color: '#f97316', revenue: `$${Math.round(175340 * multiplier).toLocaleString()}` },
-        ],
-        channelEfficiencyData: [
-            { name: 'Google Ads', roas: 3.2 + Math.random() }, { name: 'Meta Ads', roas: 2.5 + Math.random() }, { name: 'Email', roas: 4.8 + Math.random() }, { name: 'Display', roas: 1.5 + Math.random() }, { name: 'Affiliates', roas: 2.8 + Math.random() },
-        ],
-        topCampaigns: [
-            { name: 'Summer Sale Promotion', platform: 'Google Ads', spend: `$${Math.round(32450 * multiplier).toLocaleString()}`, revenue: `$${Math.round(124890 * multiplier).toLocaleString()}`, roas: '3.85x', cpa: '$28.45', conversions: `${Math.round(1286 * multiplier).toLocaleString()}` },
-            { name: 'New Collection Launch', platform: 'Meta Ads', spend: `$${Math.round(28750 * multiplier).toLocaleString()}`, revenue: `$${Math.round(95620 * multiplier).toLocaleString()}`, roas: '3.33x', cpa: '$35.12', conversions: `${Math.round(852 * multiplier).toLocaleString()}` },
-        ],
-        organicSearchOverviewMetrics: [
-             { title: 'Organic Traffic', value: Math.round(256890 * multiplier).toLocaleString(), change: '8.2%', isPositive: true, period: 'vs previous period', tooltip: 'Visitors from unpaid search results.' },
-             { title: 'Bounce Rate', value: '42.8%', change: '3.1%', isPositive: false, period: 'vs previous period', tooltip: 'Visitors who leave after one page.' },
-             { title: 'Conversion Rate', value: '2.4%', change: '0.3%', isPositive: true, period: 'vs previous period', tooltip: 'Organic visitors who convert.' },
-             { title: 'Organic Revenue', value: `$${Math.round(385420*multiplier).toLocaleString()}`, change: '12.8%', isPositive: true, period: 'vs previous period', tooltip: 'Revenue from organic search.' },
-        ],
-        topPages: [
-            { path: '/product/wedding-rings', sessions: Math.round(42350 * multiplier).toLocaleString(), bounceRate: '38.2%', avgTime: '2:45', conversions: Math.round(1286 * multiplier).toLocaleString() },
-            { path: '/blog/engagement-guide', sessions: Math.round(35780 * multiplier).toLocaleString(), bounceRate: '45.6%', avgTime: '3:12', conversions: Math.round(852 * multiplier).toLocaleString() },
-        ],
-        alerts: [
-            { id: 1, type: 'warning', title: `High CAC on ${brandName}`, description: 'Customer acquisition cost for Facebook campaigns has increased by 18% in the last 7 days.' },
-            { id: 2, type: 'danger', title: 'Underperforming Campaign', description: '"Spring Collection" campaign is performing 32% below target ROAS. Consider optimizing or pausing.' },
-        ],
-        paidMediaTabMetrics: [
-            { title: 'Spend', value: `${Math.round(156890*multiplier).toLocaleString()}`, change: '12.5%', isPositive: false, period: 'vs previous period' },
-            { title: 'Impressions', value: `${(3.1*multiplier).toFixed(1)}M`, change: '15.2%', isPositive: true, period: 'vs previous period' },
-            { title: 'CPM', value: `${(50.6*multiplier).toFixed(2)}`, change: '2.5%', isPositive: false, period: 'vs previous period' },
-            { title: 'CTR', value: '2.8%', change: '0.4%', isPositive: true, period: 'vs previous period' },
-            { title: 'CPC', value: '$0.07', change: '8.1%', isPositive: false, period: 'vs previous period' },
-            { title: 'CPL', value: `${(12.5*multiplier).toFixed(2)}`, change: '5.1%', isPositive: false, period: 'vs previous period' },
-            { title: 'Purchases', value: Math.round(8430*multiplier).toLocaleString(), change: '12.3%', isPositive: true, period: 'vs previous period' },
-            { title: 'ROAS', value: '3.2x', change: '0.5', isPositive: true, period: 'vs previous period' },
-        ],
-        paidMediaPerformanceData: Array.from({ length: 12 }, (_, i) => ({ name: `Week ${i + 1}`, spend: (10000 + Math.random() * 5000)*multiplier, clicks: (150000 + Math.random() * 50000)*multiplier, conversions: (500 + Math.random() * 200)*multiplier })),
-        spendByPlatformData: [{ name: 'Google Ads', value: 98420*multiplier }, { name: 'Meta Ads', value: 58470*multiplier }, { name: 'LinkedIn Ads', value: 24500*multiplier }, { name: 'Twitter Ads', value: 12400*multiplier }],
-        organicSearchTabMetrics: [{ title: 'Total Organic Sessions', value: Math.round(256890*multiplier).toLocaleString(), change: '8.2%', isPositive: true, period: 'vs previous period' }, { title: 'New Users', value: Math.round(180320*multiplier).toLocaleString(), change: '10.1%', isPositive: true, period: 'vs previous period' }, { title: 'Avg. Session Duration', value: '2m 15s', change: '5.2%', isPositive: true, period: 'vs previous period' }, { title: 'Goal Completions', value: Math.round(8430*multiplier).toLocaleString(), change: '12.3%', isPositive: true, period: 'vs previous period' },],
-        organicTrafficData: Array.from({ length: 30 }, (_, i) => ({ name: `Day ${i + 1}`, sessions: (8000 + Math.random() * 2000)*multiplier })),
-        topKeywords: [{ keyword: 'diamond engagement rings', position: '1', monthlySearches: '110K', clicks: '25.3K' }, { keyword: `buy ${brandName.toLowerCase()} jewelry`, position: '3', monthlySearches: '85K', clicks: '15.1K' }],
-        socialMediaMetrics: [
-            { title: 'Engagement Rate', value: '4.2%', change: '0.8%', isPositive: true, period: 'vs previous period' },
-            { title: 'Reach', value: `${(3.5*multiplier).toFixed(1)}M`, change: '12%', isPositive: true, period: 'vs previous period' },
-            { title: 'Follower Growth', value: `${(15*multiplier).toFixed(0)}K`, change: '10%', isPositive: true, period: 'last 30 days' },
-            { title: 'Top Performing Content', value: 'Video: Unboxing new collection', change: '15.2K Likes', isPositive: true, period: 'last 7 days' },
-        ],
-        followerGrowthData: [
-            { name: 'Jan', Meta: 4000*multiplier, Twitter: 2400*multiplier, Instagram: 3200*multiplier }, 
-            { name: 'Feb', 'Meta': 4500*multiplier, Twitter: 2800*multiplier, Instagram: 3800*multiplier }, 
-            { name: 'Mar', 'Meta': 5200*multiplier, Twitter: 3000*multiplier, Instagram: 4500*multiplier },
-        ],
-        competitorBenchmarkingMetrics: [
-            { title: 'Share of Voice', value: '35%', change: '2%', isPositive: true, period: 'vs previous month' },
-            { title: 'Engagement vs Competitors', value: '1.5x', change: '0.2', isPositive: true, period: 'vs previous month' },
-            { title: 'Audience Overlap', value: '25%', change: '1%', isPositive: false, period: 'vs previous month' },
-        ],
-        // topPosts: [{ platform: 'Instagram', content: `Video: Unboxing our new collection at ${brandName}!`, likes: `${(15.2*multiplier).toFixed(1)}K`, comments: '2.3K', shares: '1.1K' }],
-        ecommerceMetrics: [{ title: 'Total Orders', value: Math.round(22450*multiplier).toLocaleString(), change: '15.8%', isPositive: true, period: 'vs previous period' }, { title: 'Average Order Value', value: `$${(88.50*multiplier).toFixed(2)}`, change: '3.2%', isPositive: true, period: 'vs previous period' }, { title: 'Total Sales', value: `$${(1.98*multiplier).toFixed(2)}M`, change: '19.4%', isPositive: true, period: 'vs previous period' }, { title: 'Cart Abandonment Rate', value: '68.2%', change: '4.1%', isPositive: false, period: 'vs previous period' },],
-        salesOverTimeData: Array.from({ length: 30 }, (_, i) => ({ name: `Day ${i + 1}`, revenue: (50000 + Math.random() * 15000)*multiplier, orders: (500 + Math.random() * 200)*multiplier })),
-        topSellingProducts: [{ name: `Signature ${brandName} Ring`, sold: Math.round(4820*multiplier), revenue: `$${Math.round(722510*multiplier).toLocaleString()}` }],
-        forecastMetrics: [{ title: 'Forecasted Revenue (Next 30D)', value: `$${(1.45*multiplier).toFixed(2)}M`, change: '16%', isPositive: true, period: 'projection' }, { title: 'Projected ROAS', value: '345%', change: '33%', isPositive: true, period: 'projection' }, { title: 'Predicted Traffic Growth', value: '12%', change: '4%', isPositive: true, period: 'projection' }, { title: 'Likely Top Channel', value: 'Email', change: 'High Confidence', isPositive: true, period: 'projection' },],
-        revenueForecastData: [...Array.from({ length: 20 }, (_, i) => ({ name: `Day ${i + 1}`, actual: (30000 + i * 1000 + Math.random() * 5000)*multiplier, forecast: null })), ...Array.from({ length: 10 }, (_, i) => ({ name: `Day ${i + 21}`, actual: null, forecast: (50000 + i * 1200 + Math.random() * 4000)*multiplier })),],
-        forecastAlerts: [{ id: 1, type: 'info', title: 'Budget Allocation Opportunity', description: 'Our model predicts that shifting 10% of Display budget to Google Search could increase overall conversions by 8%.' }],
-        kols: [
-            { name: 'Aura Aurelia', platform: 'Instagram', followers: '1.2M', engagementRate: '5.8%', cost: `$${Math.round(15000*multiplier).toLocaleString()}`, attributedRevenue: `$${Math.round(75000*multiplier).toLocaleString()}`, roi: '5.0x' },
-            { name: 'Benny a.k.a The Gem', platform: 'TikTok', followers: '3.5M', engagementRate: '12.2%', cost: `$${Math.round(25000*multiplier).toLocaleString()}`, attributedRevenue: `$${Math.round(110000*multiplier).toLocaleString()}`, roi: '4.4x' },
-        ],
-        publishers: [
-            { name: 'Vogue', category: 'Fashion', impressions: `${(2.5*multiplier).toFixed(1)}M`, clicks: `${(15*multiplier).toFixed(0)}K`, spend: `$${Math.round(20000*multiplier).toLocaleString()}`, revenue: `$${Math.round(80000*multiplier).toLocaleString()}` },
-            { name: 'Forbes', category: 'Lifestyle', impressions: `${(1.8*multiplier).toFixed(1)}M`, clicks: `${(8*multiplier).toFixed(0)}K`, spend: `$${Math.round(12000*multiplier).toLocaleString()}`, revenue: `$${Math.round(42000*multiplier).toLocaleString()}` },
-        ],
-        offlineCampaigns: [
-            { name: 'City Mall Atrium', channel: 'Print Magazine', budget: `$${Math.round(50000*multiplier).toLocaleString()}`, estimatedReach: '2.5M', measuredImpact: '+18% In-Store Footfall' },
-            { name: 'Prime Time TVC', channel: 'TV', budget: `$${Math.round(120000*multiplier).toLocaleString()}`, estimatedReach: '8.0M', measuredImpact: '+25% Brand Search Lift' },
-        ],
-        socialMediaCompetitionMetrics: [
-            { title: 'Share of Voice', value: '35%', change: '+7%', isPositive: true, period: 'vs last quarter', tooltip: 'Percentage of brand mentions compared to competitors.' },
-            { title: 'Engagement Rate Benchmark', value: '4.2%', change: '+1.1%', isPositive: true, period: 'vs industry avg', tooltip: 'Average engagement rate vs top competitors.' },
-            { title: 'Follower Growth Rate', value: '+12%', change: '+4%', isPositive: true, period: 'vs competitors', tooltip: 'Growth rate of followers compared to competitor average.' },
-            { title: 'Content Output', value: '120 posts/month', change: '+33%', isPositive: true, period: 'vs competitors', tooltip: 'Number of posts compared to competitors.' },
-            { title: 'Sentiment Comparison', value: '62% Positive', change: '+18%', isPositive: true, period: 'last 3 months', tooltip: 'Share of positive sentiment in conversations vs competitors.' },
-          ],
-        socialMediaContentPerformanceMetrics: [
-            { title: 'Top Performing Content', value: 'Product Launch Reel – 1.2M views', change: '+75k engagements', isPositive: true, period: 'last campaign', tooltip: 'Best performing content by engagement and reach.' },
-            { title: 'Average Engagement per Post', value: '6,250', change: '+12%', isPositive: true, period: 'last month', tooltip: 'Average likes, comments, and shares per post.' },
-            { title: 'Video Completion Rate', value: '54%', change: '+8%', isPositive: true, period: 'last month', tooltip: 'Percentage of users watching videos until the end.' },
-            { title: 'Click-Through Rate (Organic Posts)', value: '2.8%', change: '+0.6%', isPositive: true, period: 'last month', tooltip: 'CTR from organic social media posts.' },
-            { title: 'Story/TikTok Retention', value: '65%', change: '+10%', isPositive: true, period: 'last campaign', tooltip: 'Average watch percentage for Stories and TikToks.' },
-          ],
-        socialMediaListeningMetrics: [
-            { title: 'Trending Hashtags', value: '#EcoBeauty, #SelfCareSunday, #CleanMakeup', change: 'Top 3', isPositive: true, period: 'this quarter', tooltip: 'Most used hashtags in category conversations.' },
-            { title: 'Emerging Influencers', value: '15 micro-KOLs (10k–50k)', change: '+5 new', isPositive: true, period: 'this quarter', tooltip: 'New influencers driving conversations in category.' },
-            { title: 'Sentiment Trend', value: 'Positive +18%', change: '+18%', isPositive: true, period: 'last 3 months', tooltip: 'Growth in positive sentiment over time.' },
-            { title: 'Conversation Volume', value: '+220% during Ramadan', change: '+220%', isPositive: true, period: 'campaign period', tooltip: 'Mentions volume trend across platforms.' },
-            { title: 'Category Insight', value: 'High demand for refill packs', change: 'Emerging theme', isPositive: true, period: 'this quarter', tooltip: 'New themes competitors and audiences are discussing.' },
-          ],
-        // 📈 Video Completion Rate Trend
-        videoCompletionTrend: [
-            { date: "Week 1", completionRate: 52 },
-            { date: "Week 2", completionRate: 58 },
-            { date: "Week 3", completionRate: 61 },
-            { date: "Week 4", completionRate: 65 },
-            { date: "Week 5", completionRate: 69 },
-            { date: "Week 6", completionRate: 72 },
-          ],
-        // 📊 Sentiment Trend (last 6 weeks)
-        sentimentTrend: [
-            { week: "Week 1", positive: 65, neutral: 25, negative: 10 },
-            { week: "Week 2", positive: 68, neutral: 22, negative: 10 },
-            { week: "Week 3", positive: 70, neutral: 20, negative: 10 },
-            { week: "Week 4", positive: 72, neutral: 18, negative: 10 },
-            { week: "Week 5", positive: 74, neutral: 17, negative: 9 },
-            { week: "Week 6", positive: 75, neutral: 16, negative: 9 },
-        ],
-        metrics: [
-            { title: 'Revenue', value: 'Rp49,037,642,158', change: '+12%', isPositive: true, period: 'from previous year', tooltip: 'Total revenue generated.' },
-            { title: 'ROAS', value: '6.37', change: '+8%', isPositive: true, period: 'from previous year', tooltip: 'Return on Ad Spend (Revenue/Ad Spend).' },
-            { title: 'Purchases', value: '1,022', change: '+15%', isPositive: true, period: 'from previous year', tooltip: 'Total purchases generated.' },
-            { title: 'Average Transaction Value (ATV)', value: 'Rp47,982,037', change: '+9%', isPositive: true, period: 'from previous year', tooltip: 'Average value per transaction.' },
-            { title: 'Amount Spent', value: 'Rp7,702,138,855', change: '+5%', isPositive: false, period: 'from previous year', tooltip: 'Total ad spend.' },
-            { title: 'Impressions', value: '1,879,760,492', change: '+18%', isPositive: true, period: 'from previous year', tooltip: 'Total ad impressions.' },
-            { title: 'Clicks', value: '13,343,193', change: '+22%', isPositive: true, period: 'from previous year', tooltip: 'Total ad clicks.' },
-            { title: 'CTR', value: '0.71%', change: '+2%', isPositive: true, period: 'from previous year', tooltip: 'Click-Through Rate.' },
-          ],
-        
-          revenueByChannel: [
-            { name: 'Direct', value: 351084 },
-            { name: 'Organic Search', value: 771729 },
-            { name: 'Paid Media', value: 897622 },
-            { name: 'Social Media', value: 379557 },
-          ],
-        
-          channelEfficiency: [
-            { channel: 'Google Ads', roas: 2.8 },
-            { channel: 'Meta Ads', roas: 3.3 },
-            { channel: 'Email', roas: 4.5 },
-            { channel: 'Display', roas: 2.1 },
-            { channel: 'Affiliates', roas: 2.6 },
-          ],
-        
-          paidMediaPerformance: [
-            { campaign: 'Summer Sale Promotion', platform: 'Google Ads', spend: 64375, revenue: 205088, roas: 3.85, cpa: 28.45 },
-            { campaign: 'New Collection Launch', platform: 'Meta Ads', spend: 57586, revenue: 191461, roas: 3.33, cpa: 35.12 },
-          ],
-        
-          // ✅ Chart-friendly numbers
-          socialMediaCompetitionChart: [
-            { competitor: brandName, sov: 35, engagementRate: 4.2, followerGrowth: 12 },
-            { competitor: "Competitor A", sov: 28, engagementRate: 3.9, followerGrowth: 9 },
-            { competitor: "Competitor B", sov: 22, engagementRate: 4.0, followerGrowth: 7 },
-            { competitor: "Competitor C", sov: 15, engagementRate: 3.5, followerGrowth: 5 },
-          ],
-        
-          socialMediaContentPerformance: [
-            { title: 'Top Performing Content', value: 'Product Launch Reel - 1.2M views', change: '+75%', isPositive: true, period: 'last campaign', tooltip: 'Highest performing content piece.' },
-            { title: 'Average Engagement per Post', value: '6,250', change: '+12%', isPositive: true, period: 'last month', tooltip: 'Average engagement across posts.' },
-            { title: 'Video Completion Rate', value: '54%', change: '+8%', isPositive: true, period: 'last month', tooltip: 'Percentage of users watching full video.' },
-            { title: 'Click-Through Rate (Organic Posts)', value: '2.8%', change: '+10%', isPositive: true, period: 'last month', tooltip: 'CTR for organic posts.' },
-            { title: 'Story/TikTok Retention', value: '65%', change: '+11%', isPositive: true, period: 'last campaign', tooltip: 'Retention rate on Stories/TikTok.' },
-          ],
-        
-          // ✅ Numeric chart data
-          topPosts: [
-            { title: "Product Launch Reel", engagement: 75000 },
-            { title: "Behind the Scenes Story", engagement: 54000 },
-            { title: "Customer Testimonial Carousel", engagement: 38000 },
-          ],
-        
-          socialListeningMetrics: [
-            {
-              title: "Trending Topics",
-              value: "Sustainable Jewelry",
-              change: "+New Trend",
-              isPositive: true,
-              period: "last 7 days",
-              tooltip: "Most discussed new topic in the last 7 days."
-            },
-            {
-              title: "Hashtag Analysis",
-              value: "#diamondring",
-              change: "1.2M mentions",
-              isPositive: true,
-              period: "last 7 days",
-              tooltip: "Top trending hashtag in the last 7 days."
-            },
-            {
-              title: "Sentiment Insights",
-              value: "85% Positive",
-              change: "+3%",
-              isPositive: true,
-              period: "vs previous month",
-              tooltip: "Overall sentiment trend in the last 30 days."
-            },
-            {
-              title: "Influencer Mentions",
-              value: "12 mentions",
-              change: "+4",
-              isPositive: true,
-              period: "last 7 days",
-              tooltip: "Influencers who mentioned your brand."
-            }
-          ],
+  return {
+    executiveMetrics: [
+      // { title: 'Revenue', value: 'Rp49,037,642,158', change: '-', isPositive: true, period: 'from previous year', tooltip: 'Total revenue generated.' },
+      // { title: 'ROAS', value: '6.37', change: '-', isPositive: true, period: 'from previous year', tooltip: 'Return on Ad Spend.' },
+      // { title: 'Purchases', value: '1,022', change: '-', isPositive: true, period: 'from previous year', tooltip: 'Total purchases attributed.' },
+      // { title: 'Average Transaction Value (ATV)', value: 'Rp47,982,037', change: '-', isPositive: true, period: 'from previous year', tooltip: 'Average value per purchase.' },
+    ],
+    secondaryMetrics: [
+      {
+        title: "Amount Spent",
+        value: "Rp7,702,138,855",
+        change: "-",
+        isPositive: false,
+        period: "from previous year",
+        tooltip: "Total ad spend.",
+      },
+      {
+        title: "Impressions",
+        value: "1,879,760,492",
+        change: "-",
+        isPositive: true,
+        period: "from previous year",
+        tooltip: "Total ad impressions.",
+      },
+      {
+        title: "CPM",
+        value: "Rp4,097",
+        change: "-",
+        isPositive: false,
+        period: "from previous year",
+        tooltip: "Cost per 1,000 impressions.",
+      },
+      {
+        title: "Store Visits",
+        value: "140,070",
+        change: "-",
+        isPositive: true,
+        period: "from previous year",
+        tooltip: "Store visits attributed.",
+      },
+      {
+        title: "Cost per Store Visit",
+        value: "Rp54,988",
+        change: "-",
+        isPositive: false,
+        period: "from previous year",
+        tooltip: "Average cost per store visit.",
+      },
+      {
+        title: "Leads (Website)",
+        value: "175,198",
+        change: "-",
+        isPositive: true,
+        period: "from previous year",
+        tooltip: "Total website leads captured.",
+      },
+      {
+        title: "CPL (Website)",
+        value: "Rp43,962",
+        change: "-",
+        isPositive: false,
+        period: "from previous year",
+        tooltip: "Cost per website lead.",
+      },
+    ],
+    revenueByChannelData: [
+      {
+        name: "Paid Media",
+        value: Math.round(498240 * multiplier),
+        color: "#0ea5e9",
+        revenue: `$${Math.round(498240 * multiplier).toLocaleString()}`,
+      },
+      {
+        name: "Organic Search",
+        value: Math.round(385420 * multiplier),
+        color: "#3b82f6",
+        revenue: `$${Math.round(385420 * multiplier).toLocaleString()}`,
+      },
+      {
+        name: "Social Media",
+        value: Math.round(189560 * multiplier),
+        color: "#10b981",
+        revenue: `$${Math.round(189560 * multiplier).toLocaleString()}`,
+      },
+      {
+        name: "Direct",
+        value: Math.round(175340 * multiplier),
+        color: "#f97316",
+        revenue: `$${Math.round(175340 * multiplier).toLocaleString()}`,
+      },
+    ],
+    channelEfficiencyData: [
+      { name: "Google Ads", roas: 3.2 + Math.random() },
+      { name: "Meta Ads", roas: 2.5 + Math.random() },
+      { name: "Email", roas: 4.8 + Math.random() },
+      { name: "Display", roas: 1.5 + Math.random() },
+      { name: "Affiliates", roas: 2.8 + Math.random() },
+    ],
+    topCampaigns: [
+      {
+        name: "Summer Sale Promotion",
+        platform: "Google Ads",
+        spend: `$${Math.round(32450 * multiplier).toLocaleString()}`,
+        revenue: `$${Math.round(124890 * multiplier).toLocaleString()}`,
+        roas: "3.85x",
+        cpa: "$28.45",
+        conversions: `${Math.round(1286 * multiplier).toLocaleString()}`,
+      },
+      {
+        name: "New Collection Launch",
+        platform: "Meta Ads",
+        spend: `$${Math.round(28750 * multiplier).toLocaleString()}`,
+        revenue: `$${Math.round(95620 * multiplier).toLocaleString()}`,
+        roas: "3.33x",
+        cpa: "$35.12",
+        conversions: `${Math.round(852 * multiplier).toLocaleString()}`,
+      },
+    ],
+    organicSearchOverviewMetrics: [
+      {
+        title: "Organic Traffic",
+        value: Math.round(256890 * multiplier).toLocaleString(),
+        change: "8.2%",
+        isPositive: true,
+        period: "vs previous period",
+        tooltip: "Visitors from unpaid search results.",
+      },
+      {
+        title: "Bounce Rate",
+        value: "42.8%",
+        change: "3.1%",
+        isPositive: false,
+        period: "vs previous period",
+        tooltip: "Visitors who leave after one page.",
+      },
+      {
+        title: "Conversion Rate",
+        value: "2.4%",
+        change: "0.3%",
+        isPositive: true,
+        period: "vs previous period",
+        tooltip: "Organic visitors who convert.",
+      },
+      {
+        title: "Organic Revenue",
+        value: `$${Math.round(385420 * multiplier).toLocaleString()}`,
+        change: "12.8%",
+        isPositive: true,
+        period: "vs previous period",
+        tooltip: "Revenue from organic search.",
+      },
+    ],
+    topPages: [
+      {
+        path: "/product/wedding-rings",
+        sessions: Math.round(42350 * multiplier).toLocaleString(),
+        bounceRate: "38.2%",
+        avgTime: "2:45",
+        conversions: Math.round(1286 * multiplier).toLocaleString(),
+      },
+      {
+        path: "/blog/engagement-guide",
+        sessions: Math.round(35780 * multiplier).toLocaleString(),
+        bounceRate: "45.6%",
+        avgTime: "3:12",
+        conversions: Math.round(852 * multiplier).toLocaleString(),
+      },
+    ],
+    alerts: [
+      {
+        id: 1,
+        type: "warning",
+        title: `High CAC on ${brandName}`,
+        description:
+          "Customer acquisition cost for Facebook campaigns has increased by 18% in the last 7 days.",
+      },
+      {
+        id: 2,
+        type: "danger",
+        title: "Underperforming Campaign",
+        description:
+          '"Spring Collection" campaign is performing 32% below target ROAS. Consider optimizing or pausing.',
+      },
+    ],
+    paidMediaTabMetrics: [
+      {
+        title: "Spend",
+        value: `${Math.round(156890 * multiplier).toLocaleString()}`,
+        change: "12.5%",
+        isPositive: false,
+        period: "vs previous period",
+      },
+      {
+        title: "Impressions",
+        value: `${(3.1 * multiplier).toFixed(1)}M`,
+        change: "15.2%",
+        isPositive: true,
+        period: "vs previous period",
+      },
+      {
+        title: "CPM",
+        value: `${(50.6 * multiplier).toFixed(2)}`,
+        change: "2.5%",
+        isPositive: false,
+        period: "vs previous period",
+      },
+      {
+        title: "CTR",
+        value: "2.8%",
+        change: "0.4%",
+        isPositive: true,
+        period: "vs previous period",
+      },
+      {
+        title: "CPC",
+        value: "$0.07",
+        change: "8.1%",
+        isPositive: false,
+        period: "vs previous period",
+      },
+      {
+        title: "CPL",
+        value: `${(12.5 * multiplier).toFixed(2)}`,
+        change: "5.1%",
+        isPositive: false,
+        period: "vs previous period",
+      },
+      {
+        title: "Purchases",
+        value: Math.round(8430 * multiplier).toLocaleString(),
+        change: "12.3%",
+        isPositive: true,
+        period: "vs previous period",
+      },
+      {
+        title: "ROAS",
+        value: "3.2x",
+        change: "0.5",
+        isPositive: true,
+        period: "vs previous period",
+      },
+    ],
+    paidMediaPerformanceData: Array.from({ length: 12 }, (_, i) => ({
+      name: `Week ${i + 1}`,
+      spend: (10000 + Math.random() * 5000) * multiplier,
+      clicks: (150000 + Math.random() * 50000) * multiplier,
+      conversions: (500 + Math.random() * 200) * multiplier,
+    })),
+    spendByPlatformData: [
+      { name: "Google Ads", value: 98420 * multiplier },
+      { name: "Meta Ads", value: 58470 * multiplier },
+      { name: "LinkedIn Ads", value: 24500 * multiplier },
+      { name: "Twitter Ads", value: 12400 * multiplier },
+    ],
+    organicSearchTabMetrics: [
+      {
+        title: "Total Organic Sessions",
+        value: Math.round(256890 * multiplier).toLocaleString(),
+        change: "8.2%",
+        isPositive: true,
+        period: "vs previous period",
+      },
+      {
+        title: "New Users",
+        value: Math.round(180320 * multiplier).toLocaleString(),
+        change: "10.1%",
+        isPositive: true,
+        period: "vs previous period",
+      },
+      {
+        title: "Avg. Session Duration",
+        value: "2m 15s",
+        change: "5.2%",
+        isPositive: true,
+        period: "vs previous period",
+      },
+      {
+        title: "Goal Completions",
+        value: Math.round(8430 * multiplier).toLocaleString(),
+        change: "12.3%",
+        isPositive: true,
+        period: "vs previous period",
+      },
+    ],
+    organicTrafficData: Array.from({ length: 30 }, (_, i) => ({
+      name: `Day ${i + 1}`,
+      sessions: (8000 + Math.random() * 2000) * multiplier,
+    })),
+    topKeywords: [
+      {
+        keyword: "diamond engagement rings",
+        position: "1",
+        monthlySearches: "110K",
+        clicks: "25.3K",
+      },
+      {
+        keyword: `buy ${brandName.toLowerCase()} jewelry`,
+        position: "3",
+        monthlySearches: "85K",
+        clicks: "15.1K",
+      },
+    ],
+    socialMediaMetrics: [
+      {
+        title: "Engagement Rate",
+        value: "4.2%",
+        change: "0.8%",
+        isPositive: true,
+        period: "vs previous period",
+      },
+      {
+        title: "Reach",
+        value: `${(3.5 * multiplier).toFixed(1)}M`,
+        change: "12%",
+        isPositive: true,
+        period: "vs previous period",
+      },
+      {
+        title: "Follower Growth",
+        value: `${(15 * multiplier).toFixed(0)}K`,
+        change: "10%",
+        isPositive: true,
+        period: "last 30 days",
+      },
+      {
+        title: "Top Performing Content",
+        value: "Video: Unboxing new collection",
+        change: "15.2K Likes",
+        isPositive: true,
+        period: "last 7 days",
+      },
+    ],
+    followerGrowthData: [
+      {
+        name: "Jan",
+        Meta: 4000 * multiplier,
+        Twitter: 2400 * multiplier,
+        Instagram: 3200 * multiplier,
+      },
+      {
+        name: "Feb",
+        Meta: 4500 * multiplier,
+        Twitter: 2800 * multiplier,
+        Instagram: 3800 * multiplier,
+      },
+      {
+        name: "Mar",
+        Meta: 5200 * multiplier,
+        Twitter: 3000 * multiplier,
+        Instagram: 4500 * multiplier,
+      },
+    ],
+    competitorBenchmarkingMetrics: [
+      {
+        title: "Share of Voice",
+        value: "35%",
+        change: "2%",
+        isPositive: true,
+        period: "vs previous month",
+      },
+      {
+        title: "Engagement vs Competitors",
+        value: "1.5x",
+        change: "0.2",
+        isPositive: true,
+        period: "vs previous month",
+      },
+      {
+        title: "Audience Overlap",
+        value: "25%",
+        change: "1%",
+        isPositive: false,
+        period: "vs previous month",
+      },
+    ],
+    // topPosts: [{ platform: 'Instagram', content: `Video: Unboxing our new collection at ${brandName}!`, likes: `${(15.2*multiplier).toFixed(1)}K`, comments: '2.3K', shares: '1.1K' }],
+    ecommerceMetrics: [
+      {
+        title: "Total Orders",
+        value: Math.round(22450 * multiplier).toLocaleString(),
+        change: "15.8%",
+        isPositive: true,
+        period: "vs previous period",
+      },
+      {
+        title: "Average Order Value",
+        value: `$${(88.5 * multiplier).toFixed(2)}`,
+        change: "3.2%",
+        isPositive: true,
+        period: "vs previous period",
+      },
+      {
+        title: "Total Sales",
+        value: `$${(1.98 * multiplier).toFixed(2)}M`,
+        change: "19.4%",
+        isPositive: true,
+        period: "vs previous period",
+      },
+      {
+        title: "Cart Abandonment Rate",
+        value: "68.2%",
+        change: "4.1%",
+        isPositive: false,
+        period: "vs previous period",
+      },
+    ],
+    salesOverTimeData: Array.from({ length: 30 }, (_, i) => ({
+      name: `Day ${i + 1}`,
+      revenue: (50000 + Math.random() * 15000) * multiplier,
+      orders: (500 + Math.random() * 200) * multiplier,
+    })),
+    topSellingProducts: [
+      {
+        name: `Signature ${brandName} Ring`,
+        sold: Math.round(4820 * multiplier),
+        revenue: `$${Math.round(722510 * multiplier).toLocaleString()}`,
+      },
+    ],
+    forecastMetrics: [
+      {
+        title: "Forecasted Revenue (Next 30D)",
+        value: `$${(1.45 * multiplier).toFixed(2)}M`,
+        change: "16%",
+        isPositive: true,
+        period: "projection",
+      },
+      {
+        title: "Projected ROAS",
+        value: "345%",
+        change: "33%",
+        isPositive: true,
+        period: "projection",
+      },
+      {
+        title: "Predicted Traffic Growth",
+        value: "12%",
+        change: "4%",
+        isPositive: true,
+        period: "projection",
+      },
+      {
+        title: "Likely Top Channel",
+        value: "Email",
+        change: "High Confidence",
+        isPositive: true,
+        period: "projection",
+      },
+    ],
+    revenueForecastData: [
+      ...Array.from({ length: 20 }, (_, i) => ({
+        name: `Day ${i + 1}`,
+        actual: (30000 + i * 1000 + Math.random() * 5000) * multiplier,
+        forecast: null,
+      })),
+      ...Array.from({ length: 10 }, (_, i) => ({
+        name: `Day ${i + 21}`,
+        actual: null,
+        forecast: (50000 + i * 1200 + Math.random() * 4000) * multiplier,
+      })),
+    ],
+    forecastAlerts: [
+      {
+        id: 1,
+        type: "info",
+        title: "Budget Allocation Opportunity",
+        description:
+          "Our model predicts that shifting 10% of Display budget to Google Search could increase overall conversions by 8%.",
+      },
+    ],
+    kols: [
+      {
+        name: "Aura Aurelia",
+        platform: "Instagram",
+        followers: "1.2M",
+        engagementRate: "5.8%",
+        cost: `$${Math.round(15000 * multiplier).toLocaleString()}`,
+        attributedRevenue: `$${Math.round(
+          75000 * multiplier
+        ).toLocaleString()}`,
+        roi: "5.0x",
+      },
+      {
+        name: "Benny a.k.a The Gem",
+        platform: "TikTok",
+        followers: "3.5M",
+        engagementRate: "12.2%",
+        cost: `$${Math.round(25000 * multiplier).toLocaleString()}`,
+        attributedRevenue: `$${Math.round(
+          110000 * multiplier
+        ).toLocaleString()}`,
+        roi: "4.4x",
+      },
+    ],
+    publishers: [
+      {
+        name: "Vogue",
+        category: "Fashion",
+        impressions: `${(2.5 * multiplier).toFixed(1)}M`,
+        clicks: `${(15 * multiplier).toFixed(0)}K`,
+        spend: `$${Math.round(20000 * multiplier).toLocaleString()}`,
+        revenue: `$${Math.round(80000 * multiplier).toLocaleString()}`,
+      },
+      {
+        name: "Forbes",
+        category: "Lifestyle",
+        impressions: `${(1.8 * multiplier).toFixed(1)}M`,
+        clicks: `${(8 * multiplier).toFixed(0)}K`,
+        spend: `$${Math.round(12000 * multiplier).toLocaleString()}`,
+        revenue: `$${Math.round(42000 * multiplier).toLocaleString()}`,
+      },
+    ],
+    offlineCampaigns: [
+      {
+        name: "City Mall Atrium",
+        channel: "Print Magazine",
+        budget: `$${Math.round(50000 * multiplier).toLocaleString()}`,
+        estimatedReach: "2.5M",
+        measuredImpact: "+18% In-Store Footfall",
+      },
+      {
+        name: "Prime Time TVC",
+        channel: "TV",
+        budget: `$${Math.round(120000 * multiplier).toLocaleString()}`,
+        estimatedReach: "8.0M",
+        measuredImpact: "+25% Brand Search Lift",
+      },
+    ],
+    socialMediaCompetitionMetrics: [
+      {
+        title: "Share of Voice",
+        value: "35%",
+        change: "+7%",
+        isPositive: true,
+        period: "vs last quarter",
+        tooltip: "Percentage of brand mentions compared to competitors.",
+      },
+      {
+        title: "Engagement Rate Benchmark",
+        value: "4.2%",
+        change: "+1.1%",
+        isPositive: true,
+        period: "vs industry avg",
+        tooltip: "Average engagement rate vs top competitors.",
+      },
+      {
+        title: "Follower Growth Rate",
+        value: "+12%",
+        change: "+4%",
+        isPositive: true,
+        period: "vs competitors",
+        tooltip: "Growth rate of followers compared to competitor average.",
+      },
+      {
+        title: "Content Output",
+        value: "120 posts/month",
+        change: "+33%",
+        isPositive: true,
+        period: "vs competitors",
+        tooltip: "Number of posts compared to competitors.",
+      },
+      {
+        title: "Sentiment Comparison",
+        value: "62% Positive",
+        change: "+18%",
+        isPositive: true,
+        period: "last 3 months",
+        tooltip: "Share of positive sentiment in conversations vs competitors.",
+      },
+    ],
+    socialMediaContentPerformanceMetrics: [
+      {
+        title: "Top Performing Content",
+        value: "Product Launch Reel – 1.2M views",
+        change: "+75k engagements",
+        isPositive: true,
+        period: "last campaign",
+        tooltip: "Best performing content by engagement and reach.",
+      },
+      {
+        title: "Average Engagement per Post",
+        value: "6,250",
+        change: "+12%",
+        isPositive: true,
+        period: "last month",
+        tooltip: "Average likes, comments, and shares per post.",
+      },
+      {
+        title: "Video Completion Rate",
+        value: "54%",
+        change: "+8%",
+        isPositive: true,
+        period: "last month",
+        tooltip: "Percentage of users watching videos until the end.",
+      },
+      {
+        title: "Click-Through Rate (Organic Posts)",
+        value: "2.8%",
+        change: "+0.6%",
+        isPositive: true,
+        period: "last month",
+        tooltip: "CTR from organic social media posts.",
+      },
+      {
+        title: "Story/TikTok Retention",
+        value: "65%",
+        change: "+10%",
+        isPositive: true,
+        period: "last campaign",
+        tooltip: "Average watch percentage for Stories and TikToks.",
+      },
+    ],
+    socialMediaListeningMetrics: [
+      {
+        title: "Trending Hashtags",
+        value: "#EcoBeauty, #SelfCareSunday, #CleanMakeup",
+        change: "Top 3",
+        isPositive: true,
+        period: "this quarter",
+        tooltip: "Most used hashtags in category conversations.",
+      },
+      {
+        title: "Emerging Influencers",
+        value: "15 micro-KOLs (10k–50k)",
+        change: "+5 new",
+        isPositive: true,
+        period: "this quarter",
+        tooltip: "New influencers driving conversations in category.",
+      },
+      {
+        title: "Sentiment Trend",
+        value: "Positive +18%",
+        change: "+18%",
+        isPositive: true,
+        period: "last 3 months",
+        tooltip: "Growth in positive sentiment over time.",
+      },
+      {
+        title: "Conversation Volume",
+        value: "+220% during Ramadan",
+        change: "+220%",
+        isPositive: true,
+        period: "campaign period",
+        tooltip: "Mentions volume trend across platforms.",
+      },
+      {
+        title: "Category Insight",
+        value: "High demand for refill packs",
+        change: "Emerging theme",
+        isPositive: true,
+        period: "this quarter",
+        tooltip: "New themes competitors and audiences are discussing.",
+      },
+    ],
+    // 📈 Video Completion Rate Trend
+    videoCompletionTrend: [
+      { date: "Week 1", completionRate: 52 },
+      { date: "Week 2", completionRate: 58 },
+      { date: "Week 3", completionRate: 61 },
+      { date: "Week 4", completionRate: 65 },
+      { date: "Week 5", completionRate: 69 },
+      { date: "Week 6", completionRate: 72 },
+    ],
+    // 📊 Sentiment Trend (last 6 weeks)
+    sentimentTrend: [
+      { week: "Week 1", positive: 65, neutral: 25, negative: 10 },
+      { week: "Week 2", positive: 68, neutral: 22, negative: 10 },
+      { week: "Week 3", positive: 70, neutral: 20, negative: 10 },
+      { week: "Week 4", positive: 72, neutral: 18, negative: 10 },
+      { week: "Week 5", positive: 74, neutral: 17, negative: 9 },
+      { week: "Week 6", positive: 75, neutral: 16, negative: 9 },
+    ],
+    metrics: [
+      {
+        title: "Revenue",
+        value: "Rp49,037,642,158",
+        change: "+12%",
+        isPositive: true,
+        period: "from previous year",
+        tooltip: "Total revenue generated.",
+      },
+      {
+        title: "ROAS",
+        value: "6.37",
+        change: "+8%",
+        isPositive: true,
+        period: "from previous year",
+        tooltip: "Return on Ad Spend (Revenue/Ad Spend).",
+      },
+      {
+        title: "Purchases",
+        value: "1,022",
+        change: "+15%",
+        isPositive: true,
+        period: "from previous year",
+        tooltip: "Total purchases generated.",
+      },
+      {
+        title: "Average Transaction Value (ATV)",
+        value: "Rp47,982,037",
+        change: "+9%",
+        isPositive: true,
+        period: "from previous year",
+        tooltip: "Average value per transaction.",
+      },
+      {
+        title: "Amount Spent",
+        value: "Rp7,702,138,855",
+        change: "+5%",
+        isPositive: false,
+        period: "from previous year",
+        tooltip: "Total ad spend.",
+      },
+      {
+        title: "Impressions",
+        value: "1,879,760,492",
+        change: "+18%",
+        isPositive: true,
+        period: "from previous year",
+        tooltip: "Total ad impressions.",
+      },
+      {
+        title: "Clicks",
+        value: "13,343,193",
+        change: "+22%",
+        isPositive: true,
+        period: "from previous year",
+        tooltip: "Total ad clicks.",
+      },
+      {
+        title: "CTR",
+        value: "0.71%",
+        change: "+2%",
+        isPositive: true,
+        period: "from previous year",
+        tooltip: "Click-Through Rate.",
+      },
+    ],
 
-          trendingHashtags: [
-            { hashtag: "#sustainablejewelry", mentions: 1200 },
-            { hashtag: "#diamondring", mentions: 950 },
-            { hashtag: "#goldnecklace", mentions: 740 },
-            { hashtag: "#ethicalfashion", mentions: 600 },
-            { hashtag: "#weddingband", mentions: 420 },
-          ],
-        
-    };
+    revenueByChannel: [
+      { name: "Direct", value: 351084 },
+      { name: "Organic Search", value: 771729 },
+      { name: "Paid Media", value: 897622 },
+      { name: "Social Media", value: 379557 },
+    ],
+
+    channelEfficiency: [
+      { channel: "Google Ads", roas: 2.8 },
+      { channel: "Meta Ads", roas: 3.3 },
+      { channel: "Email", roas: 4.5 },
+      { channel: "Display", roas: 2.1 },
+      { channel: "Affiliates", roas: 2.6 },
+    ],
+
+    paidMediaPerformance: [
+      {
+        campaign: "Summer Sale Promotion",
+        platform: "Google Ads",
+        spend: 64375,
+        revenue: 205088,
+        roas: 3.85,
+        cpa: 28.45,
+      },
+      {
+        campaign: "New Collection Launch",
+        platform: "Meta Ads",
+        spend: 57586,
+        revenue: 191461,
+        roas: 3.33,
+        cpa: 35.12,
+      },
+    ],
+
+    // ✅ Chart-friendly numbers
+    socialMediaCompetitionChart: [
+      {
+        competitor: brandName,
+        sov: 35,
+        engagementRate: 4.2,
+        followerGrowth: 12,
+      },
+      {
+        competitor: "Competitor A",
+        sov: 28,
+        engagementRate: 3.9,
+        followerGrowth: 9,
+      },
+      {
+        competitor: "Competitor B",
+        sov: 22,
+        engagementRate: 4.0,
+        followerGrowth: 7,
+      },
+      {
+        competitor: "Competitor C",
+        sov: 15,
+        engagementRate: 3.5,
+        followerGrowth: 5,
+      },
+    ],
+
+    socialMediaContentPerformance: [
+      {
+        title: "Top Performing Content",
+        value: "Product Launch Reel - 1.2M views",
+        change: "+75%",
+        isPositive: true,
+        period: "last campaign",
+        tooltip: "Highest performing content piece.",
+      },
+      {
+        title: "Average Engagement per Post",
+        value: "6,250",
+        change: "+12%",
+        isPositive: true,
+        period: "last month",
+        tooltip: "Average engagement across posts.",
+      },
+      {
+        title: "Video Completion Rate",
+        value: "54%",
+        change: "+8%",
+        isPositive: true,
+        period: "last month",
+        tooltip: "Percentage of users watching full video.",
+      },
+      {
+        title: "Click-Through Rate (Organic Posts)",
+        value: "2.8%",
+        change: "+10%",
+        isPositive: true,
+        period: "last month",
+        tooltip: "CTR for organic posts.",
+      },
+      {
+        title: "Story/TikTok Retention",
+        value: "65%",
+        change: "+11%",
+        isPositive: true,
+        period: "last campaign",
+        tooltip: "Retention rate on Stories/TikTok.",
+      },
+    ],
+
+    // ✅ Numeric chart data
+    topPosts: [
+      { title: "Product Launch Reel", engagement: 75000 },
+      { title: "Behind the Scenes Story", engagement: 54000 },
+      { title: "Customer Testimonial Carousel", engagement: 38000 },
+    ],
+
+    socialListeningMetrics: [
+      {
+        title: "Trending Topics",
+        value: "Sustainable Jewelry",
+        change: "+New Trend",
+        isPositive: true,
+        period: "last 7 days",
+        tooltip: "Most discussed new topic in the last 7 days.",
+      },
+      {
+        title: "Hashtag Analysis",
+        value: "#diamondring",
+        change: "1.2M mentions",
+        isPositive: true,
+        period: "last 7 days",
+        tooltip: "Top trending hashtag in the last 7 days.",
+      },
+      {
+        title: "Sentiment Insights",
+        value: "85% Positive",
+        change: "+3%",
+        isPositive: true,
+        period: "vs previous month",
+        tooltip: "Overall sentiment trend in the last 30 days.",
+      },
+      {
+        title: "Influencer Mentions",
+        value: "12 mentions",
+        change: "+4",
+        isPositive: true,
+        period: "last 7 days",
+        tooltip: "Influencers who mentioned your brand.",
+      },
+    ],
+
+    trendingHashtags: [
+      { hashtag: "#sustainablejewelry", mentions: 1200 },
+      { hashtag: "#diamondring", mentions: 950 },
+      { hashtag: "#goldnecklace", mentions: 740 },
+      { hashtag: "#ethicalfashion", mentions: 600 },
+      { hashtag: "#weddingband", mentions: 420 },
+    ],
+
+    recommendations: [
+      {
+        title: "Optimize High-Performing Campaigns",
+        description: `Our AI analysis shows that your Google Ads campaigns have a 3.2x ROAS. Consider increasing budget allocation by 15% to these campaigns to maximize revenue potential while maintaining current conversion rates.`,
+      },
+      {
+        title: "Improve Social Media Engagement Timing",
+        description:
+          "Data indicates peak engagement occurs between 7-9 PM on weekdays. Scheduling posts during these windows could increase engagement by an estimated 24% based on historical performance patterns.",
+      },
+      {
+        title: "Cart Abandonment Recovery Strategy",
+        description:
+          "With a 68.2% cart abandonment rate, implementing an automated email sequence could recover approximately 12-15% of abandoned carts, potentially adding $180K in monthly revenue.",
+      },
+      {
+        title: "Seasonal Keyword Expansion",
+        description:
+          "Analysis reveals untapped opportunities with long-tail keywords related to 'sustainable jewelry' and 'ethical diamonds'. These keywords show 40% lower competition with strong commercial intent.",
+      },
+    ],
+  };
 };
 
 export const allBrandsData: AllBrandsData = {
-    'Frank & Co': createBrandData('Frank & Co'),
-    'The Palace': createBrandData('The Palace'),
-    'Mondial': createBrandData('Mondial'),
-    'LakuEmas': createBrandData('LakuEmas'),
+  "Frank & Co": createBrandData("Frank & Co"),
+  "The Palace": createBrandData("The Palace"),
+  Mondial: createBrandData("Mondial"),
+  LakuEmas: createBrandData("LakuEmas"),
 };
 
-export const allBrands: Brand[] = ['Frank & Co', 'The Palace', 'Mondial', 'LakuEmas'];
+export const allBrands: Brand[] = [
+  "Frank & Co",
+  "The Palace",
+  "Mondial",
+  "LakuEmas",
+];
 
 // --- User and Role Management Data ---
 
 export const mockRoles: UserRole[] = [
-    {
-        id: 'c-level',
-        name: 'C-Level',
-        description: 'Full access to all brands and settings.',
-        permissions: {
-            canViewAllBrands: true,
-            allowedReports: ['dashboard', 'report-paid-media', 'report-organic-search', 'report-social-media', 'report-ecommerce', 'report-kol', 'report-publishers', 'report-offline-media', 'report-competitor-benchmarking', 'report-social-listening'],
-            canManageUsers: true,
-        },
+  {
+    id: "c-level",
+    name: "C-Level",
+    description: "Full access to all brands and settings.",
+    permissions: {
+      canViewAllBrands: true,
+      allowedReports: [
+        "dashboard",
+        "report-paid-media",
+        "report-organic-search",
+        "report-social-media",
+        "report-ecommerce",
+        "report-kol",
+        "report-publishers",
+        "report-offline-media",
+        "report-competitor-benchmarking",
+        "report-social-listening",
+      ],
+      canManageUsers: true,
     },
-    {
-        id: 'director',
-        name: 'Director',
-        description: 'View all reports for assigned brands.',
-        permissions: {
-            canViewAllBrands: false,
-            allowedReports: ['dashboard', 'report-paid-media', 'report-organic-search', 'report-social-media', 'report-ecommerce', 'report-kol', 'report-publishers', 'report-offline-media'],
-            canManageUsers: true,
-        },
+  },
+  {
+    id: "director",
+    name: "Director",
+    description: "View all reports for assigned brands.",
+    permissions: {
+      canViewAllBrands: false,
+      allowedReports: [
+        "dashboard",
+        "report-paid-media",
+        "report-organic-search",
+        "report-social-media",
+        "report-ecommerce",
+        "report-kol",
+        "report-publishers",
+        "report-offline-media",
+      ],
+      canManageUsers: true,
     },
-    {
-        id: 'manager',
-        name: 'Manager',
-        description: 'View specific reports for assigned brands.',
-        permissions: {
-            canViewAllBrands: false,
-            allowedReports: ['dashboard', 'report-paid-media', 'report-social-media'],
-            canManageUsers: false,
-        },
+  },
+  {
+    id: "manager",
+    name: "Manager",
+    description: "View specific reports for assigned brands.",
+    permissions: {
+      canViewAllBrands: false,
+      allowedReports: ["dashboard", "report-paid-media", "report-social-media"],
+      canManageUsers: false,
     },
-    {
-        id: 'analyst',
-        name: 'Analyst',
-        description: 'View-only access to specific reports.',
-        permissions: {
-            canViewAllBrands: false,
-            allowedReports: ['dashboard'],
-            canManageUsers: false,
-        },
+  },
+  {
+    id: "analyst",
+    name: "Analyst",
+    description: "View-only access to specific reports.",
+    permissions: {
+      canViewAllBrands: false,
+      allowedReports: ["dashboard"],
+      canManageUsers: false,
     },
+  },
 ];
 
 export const mockUsers: User[] = [
-    {
-        id: 'usr-1',
-        name: 'Eleanor Vance',
-        email: 'demo@cmk-smart.com',
-        avatarUrl: 'https://randomuser.me/api/portraits/women/44.jpg',
-        roleId: 'c-level',
-        assignedBrands: [], // Gets all brands by role
-        status: 'Active',
-    },
-    {
-        id: 'usr-2',
-        name: 'Marcus Holloway',
-        email: 'marcus.holloway@cmk.com',
-        avatarUrl: 'https://randomuser.me/api/portraits/men/46.jpg',
-        roleId: 'director',
-        assignedBrands: ['Frank & Co', 'The Palace'],
-        status: 'Active',
-    },
-    {
-        id: 'usr-3',
-        name: 'Clara Oswald',
-        email: 'clara.oswald@cmk.com',
-        avatarUrl: 'https://randomuser.me/api/portraits/women/47.jpg',
-        roleId: 'manager',
-        assignedBrands: ['Frank & Co'],
-        status: 'Active',
-    },
-    {
-        id: 'usr-4',
-        name: 'Arthur Pendragon',
-        email: 'arthur.pendragon@cmk.com',
-        avatarUrl: 'https://randomuser.me/api/portraits/men/48.jpg',
-        roleId: 'analyst',
-        assignedBrands: ['The Palace'],
-        status: 'Active',
-    },
-    {
-        id: 'usr-5',
-        name: 'Gwen Stacy',
-        email: 'gwen.stacy@cmk.com',
-        avatarUrl: 'https://randomuser.me/api/portraits/women/49.jpg',
-        roleId: 'director',
-        assignedBrands: ['Mondial', 'LakuEmas'],
-        status: 'Invited',
-    },
+  {
+    id: "usr-1",
+    name: "Eleanor Vance",
+    email: "demo@cmk-smart.com",
+    avatarUrl: "https://randomuser.me/api/portraits/women/44.jpg",
+    roleId: "c-level",
+    assignedBrands: [], // Gets all brands by role
+    status: "Active",
+  },
+  {
+    id: "usr-2",
+    name: "Marcus Holloway",
+    email: "marcus.holloway@cmk.com",
+    avatarUrl: "https://randomuser.me/api/portraits/men/46.jpg",
+    roleId: "director",
+    assignedBrands: ["Frank & Co", "The Palace"],
+    status: "Active",
+  },
+  {
+    id: "usr-3",
+    name: "Clara Oswald",
+    email: "clara.oswald@cmk.com",
+    avatarUrl: "https://randomuser.me/api/portraits/women/47.jpg",
+    roleId: "manager",
+    assignedBrands: ["Frank & Co"],
+    status: "Active",
+  },
+  {
+    id: "usr-4",
+    name: "Arthur Pendragon",
+    email: "arthur.pendragon@cmk.com",
+    avatarUrl: "https://randomuser.me/api/portraits/men/48.jpg",
+    roleId: "analyst",
+    assignedBrands: ["The Palace"],
+    status: "Active",
+  },
+  {
+    id: "usr-5",
+    name: "Gwen Stacy",
+    email: "gwen.stacy@cmk.com",
+    avatarUrl: "https://randomuser.me/api/portraits/women/49.jpg",
+    roleId: "director",
+    assignedBrands: ["Mondial", "LakuEmas"],
+    status: "Invited",
+  },
 ];
