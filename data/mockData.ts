@@ -911,23 +911,23 @@ const createBrandData = (brandName: Brand): DashboardData => {
 
     recommendations: [
       {
-        title: "Optimize High-Performing Campaigns",
-        description: `Our AI analysis shows that your Google Ads campaigns have a 3.2x ROAS. Consider increasing budget allocation by 15% to these campaigns to maximize revenue potential while maintaining current conversion rates.`,
+        title: "Strategic Budget Reallocation",
+        description: `Performance data suggests reallocating 20% of media budget from underperforming channels to high-ROAS digital channels could increase overall revenue by $320K annually. Recommend establishing quarterly budget optimization reviews to maintain competitive advantage.`,
       },
       {
-        title: "Improve Social Media Engagement Timing",
+        title: "Customer Acquisition Cost Optimization",
         description:
-          "Data indicates peak engagement occurs between 7-9 PM on weekdays. Scheduling posts during these windows could increase engagement by an estimated 24% based on historical performance patterns.",
+          "Current CAC trends indicate 18% increase across Facebook campaigns. Recommend implementing multi-touch attribution model and diversifying acquisition channels to reduce dependency and improve cost efficiency by Q2.",
       },
       {
-        title: "Cart Abandonment Recovery Strategy",
+        title: "Revenue Recovery Initiative",
         description:
-          "With a 68.2% cart abandonment rate, implementing an automated email sequence could recover approximately 12-15% of abandoned carts, potentially adding $180K in monthly revenue.",
+          "Cart abandonment analysis reveals $2.1M in recoverable annual revenue opportunity. Recommend launching comprehensive retention marketing program with dedicated team and technology stack to capture this value.",
       },
       {
-        title: "Seasonal Keyword Expansion",
+        title: "Market Expansion Strategy",
         description:
-          "Analysis reveals untapped opportunities with long-tail keywords related to 'sustainable jewelry' and 'ethical diamonds'. These keywords show 40% lower competition with strong commercial intent.",
+          "Competitive analysis shows 35% market share growth opportunity in sustainable luxury segment. Recommend developing dedicated product line and marketing strategy to capture emerging eco-conscious demographic by Q3.",
       },
     ],
   };
