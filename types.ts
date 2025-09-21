@@ -1,4 +1,33 @@
-export type Brand = "Frank & Co" | "The Palace" | "Mondial" | "LakuEmas";
+export type Brand = "The Palace" | "Frank & Co" | "Mondial" | "Laku Emas";
+
+export interface BrandConfig {
+  id: Brand;
+  displayName: string;
+  databaseValues: string[]; // Array of possible database values for this brand
+}
+
+export const BRAND_CONFIG: BrandConfig[] = [
+  {
+    id: "The Palace",
+    displayName: "The Palace",
+    databaseValues: ["ThePalace"]
+  },
+  {
+    id: "Frank & Co",
+    displayName: "Frank & Co",
+    databaseValues: ["Franknco", "Frank&co"]
+  },
+  {
+    id: "Mondial",
+    displayName: "Mondial", 
+    databaseValues: ["Mondial"]
+  },
+  {
+    id: "Laku Emas",
+    displayName: "Laku Emas",
+    databaseValues: ["LakuEmas"]
+  }
+];
 
 export type ActiveView =
   | "dashboard"
@@ -221,7 +250,14 @@ export interface DashboardData {
     neutral: number;
     negative: number;
   }[];
+  trendingHashtags: { hashtag: string; mentions: number }[];
   recommendations: AIRecommendation[];
+  
+  // New chart data from campaign_staging
+  campaignObjectiveData: { objective: string; spend: number; campaigns: number }[];
+  monthlySpendData: { month: string; spend: number }[];
+  productPerformanceData: { product: string; leads: number; spend: number }[];
+  funnelPerformanceData: { funnel: string; campaigns: number; avgSpend: number }[];
 }
 
 export type AllBrandsData = Record<Brand, DashboardData>;

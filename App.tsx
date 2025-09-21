@@ -12,8 +12,8 @@ import SettingsPage from './components/SettingsPage';
 import HelpWidget from './components/HelpWidget';
 import AiSidebar from './components/AiSidebar';
 import { HelpCircleIcon } from './components/icons';
-import type { Brand, ActiveView, AIResponse, ConversationItem } from './types';
-import { allBrandsData } from './data/mockData';
+import type { Brand, ActiveView, AIResponse, ConversationItem, DashboardData } from './types';
+import { getRealCampaignData } from './data/realCampaignData';
 
 // Import all report pages
 import PaidMediaReport from './components/reports/PaidMediaReport';
@@ -43,14 +43,74 @@ const App: React.FC<AppProps> = ({ onLogout, user }) => {
     const [aiConversation, setAiConversation] = useState<ConversationItem[]>([]);
     const [isAiLoading, setIsAiLoading] = useState(false);
     const [currentChatId, setCurrentChatId] = useState<string | null>(null);
+    
+    // Real data state
+    const [realBrandData, setRealBrandData] = useState<Record<Brand, DashboardData>>({} as Record<Brand, DashboardData>);
+    const [isDataLoading, setIsDataLoading] = useState(false);
+    const [dataLoadError, setDataLoadError] = useState<string | null>(null);
 
+    // Function to load real campaign data for a brand (real-time, no caching)
+    const loadBrandData = async (brand: Brand) => {
+        console.log(`🚀 loadBrandData called for brand: ${brand}`);
+        setIsDataLoading(true);
+        setDataLoadError(null);
+        
+        try {
+            console.log(`🔄 App.tsx: Loading real-time data for ${brand}...`);
+            const data = await getRealCampaignData(brand);
+            console.log(`📊 App.tsx: Data received for ${brand}:`, {
+                executiveMetrics: data.executiveMetrics?.length || 0,
+                secondaryMetrics: data.secondaryMetrics?.length || 0,
+                topCampaigns: data.topCampaigns?.length || 0,
+                alerts: data.alerts?.length || 0,
+                recommendations: data.recommendations?.length || 0
+            });
+            setRealBrandData(prev => ({
+                ...prev,
+                [brand]: data
+            }));
+            console.log(`✅ App.tsx: Successfully loaded and stored data for ${brand}`);
+        } catch (error) {
+            console.error(`❌ App.tsx: Failed to load data for ${brand}:`, error);
+            setDataLoadError(`Failed to load data for ${brand}`);
+        } finally {
+            setIsDataLoading(false);
+            console.log(`🏁 App.tsx: Loading completed for ${brand}, isDataLoading set to false`);
+        }
+    };
+
+    // Function to refresh data for current brand
+    const refreshCurrentBrandData = () => {
+        if (selectedBrand) {
+            console.log(`🔄 App.tsx: Refreshing data for ${selectedBrand}...`);
+            loadBrandData(selectedBrand);
+        }
+    };
 
     useEffect(() => {
+        console.log('🚀 App.tsx: Initial useEffect - checking for default brand');
         const defaultBrand = localStorage.getItem('defaultBrand') as Brand | null;
+        console.log(`📂 App.tsx: Default brand from localStorage: ${defaultBrand}`);
         if (defaultBrand) {
+            console.log(`🎯 App.tsx: Setting selected brand to: ${defaultBrand}`);
             setSelectedBrand(defaultBrand);
+            // Don't call loadBrandData here - let the brand selection useEffect handle it
+        } else {
+            console.log('❓ App.tsx: No default brand found, user will need to select one');
         }
     }, []);
+
+    // Load fresh data every time brand changes (real-time filtering)
+    useEffect(() => {
+        console.log(`🔄 App.tsx: Brand selection useEffect triggered, selectedBrand: ${selectedBrand}`);
+        if (selectedBrand) {
+            console.log(`🎯 App.tsx: Brand changed to ${selectedBrand} - fetching fresh data...`);
+            console.log(`📊 App.tsx: Current brand data cache:`, Object.keys(realBrandData));
+            loadBrandData(selectedBrand);
+        } else {
+            console.log('❓ App.tsx: selectedBrand is null, skipping data load');
+        }
+    }, [selectedBrand]);
     
     const handleAiPrompt = async (prompt: string, brand: Brand) => {
         setIsAiLoading(true);
@@ -202,10 +262,24 @@ const App: React.FC<AppProps> = ({ onLogout, user }) => {
     };
 
     const handleBrandSelection = (brand: Brand) => {
+        console.log(`🎯 App.tsx: handleBrandSelection called with brand: ${brand}`);
         const defaultBrandExists = !!localStorage.getItem('defaultBrand');
+        console.log(`📂 App.tsx: Default brand exists: ${defaultBrandExists}`);
+        
+        console.log(`🔄 App.tsx: Setting selectedBrand to: ${brand}`);
         setSelectedBrand(brand);
+        
+        // Clear existing data to show loading state
+        console.log(`🗑️ App.tsx: Clearing cached data for ${brand} to trigger fresh load`);
+        setRealBrandData(prev => {
+            const newData = { ...prev };
+            delete newData[brand]; // Remove cached data to trigger fresh load
+            console.log(`📊 App.tsx: Data cache after clearing ${brand}:`, Object.keys(newData));
+            return newData;
+        });
 
         if (!defaultBrandExists) {
+            console.log(`📝 App.tsx: No default brand set, showing modal for ${brand}`);
             setShowSetDefaultModal(true);
         }
     };
@@ -248,13 +322,21 @@ const App: React.FC<AppProps> = ({ onLogout, user }) => {
             return <div className={mainContentPadding}>{content}</div>;
         }
 
-        const data = allBrandsData[selectedBrand];
+        const data = realBrandData[selectedBrand];
         const reportProps = { data, brandName: selectedBrand };
         
         let content;
         switch (activeView) {
             case 'dashboard':
-                content = <Dashboard selectedBrand={selectedBrand} onAiPrompt={handleAiPrompt} isAiLoading={isAiLoading} aiConversation={aiConversation} />;
+                content = <Dashboard 
+                    selectedBrand={selectedBrand} 
+                    onAiPrompt={handleAiPrompt} 
+                    isAiLoading={isAiLoading} 
+                    aiConversation={aiConversation}
+                    data={realBrandData[selectedBrand]}
+                    isDataLoading={isDataLoading}
+                    onRefreshData={refreshCurrentBrandData}
+                />;
                 break;
             case 'report-paid-media':
                 content = <PaidMediaReport {...reportProps} />;
@@ -284,7 +366,15 @@ const App: React.FC<AppProps> = ({ onLogout, user }) => {
                 content = <SocialListeningReport {...reportProps} />;
                 break;
             default:
-                content = <Dashboard selectedBrand={selectedBrand} onAiPrompt={handleAiPrompt} isAiLoading={isAiLoading} aiConversation={aiConversation} />;
+                content = <Dashboard 
+                    selectedBrand={selectedBrand} 
+                    onAiPrompt={handleAiPrompt} 
+                    isAiLoading={isAiLoading} 
+                    aiConversation={aiConversation}
+                    data={realBrandData[selectedBrand]}
+                    isDataLoading={isDataLoading}
+                    onRefreshData={refreshCurrentBrandData}
+                />;
         }
 
         return <div className={mainContentPadding}>{content}</div>;

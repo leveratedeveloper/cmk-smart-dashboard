@@ -934,17 +934,15 @@ const createBrandData = (brandName: Brand): DashboardData => {
 };
 
 export const allBrandsData: AllBrandsData = {
-  "Frank & Co": createBrandData("Frank & Co"),
   "The Palace": createBrandData("The Palace"),
-  Mondial: createBrandData("Mondial"),
-  LakuEmas: createBrandData("LakuEmas"),
+  "Franknco": createBrandData("Franknco"),
+  "Mondial": createBrandData("Mondial"),
 };
 
 export const allBrands: Brand[] = [
-  "Frank & Co",
   "The Palace",
+  "Franknco", 
   "Mondial",
-  "LakuEmas",
 ];
 
 // --- User and Role Management Data ---
@@ -1028,7 +1026,7 @@ export const mockUsers: User[] = [
     email: "marcus.holloway@cmk.com",
     avatarUrl: "https://randomuser.me/api/portraits/men/46.jpg",
     roleId: "director",
-    assignedBrands: ["Frank & Co", "The Palace"],
+    assignedBrands: ["Franknco", "The Palace"],
     status: "Active",
   },
   {
@@ -1037,7 +1035,7 @@ export const mockUsers: User[] = [
     email: "clara.oswald@cmk.com",
     avatarUrl: "https://randomuser.me/api/portraits/women/47.jpg",
     roleId: "manager",
-    assignedBrands: ["Frank & Co"],
+    assignedBrands: ["Franknco"],
     status: "Active",
   },
   {
@@ -1055,7 +1053,7 @@ export const mockUsers: User[] = [
     email: "gwen.stacy@cmk.com",
     avatarUrl: "https://randomuser.me/api/portraits/women/49.jpg",
     roleId: "director",
-    assignedBrands: ["Mondial", "LakuEmas"],
+    assignedBrands: ["Mondial"],
     status: "Invited",
   },
 ];
