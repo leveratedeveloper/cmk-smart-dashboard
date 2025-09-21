@@ -188,7 +188,7 @@ const Dashboard: React.FC<DashboardProps> = ({
               ))}
             </div>
           </div>
-          <div title="AI-generated recommendations and next steps.">
+          <div title="AI-generated recommendations and next steps." className="mt-8">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-bold text-gray-800">
                 Recommendations & Next Steps
@@ -209,7 +209,7 @@ const Dashboard: React.FC<DashboardProps> = ({
               ))}
             </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
             {data.executiveMetrics.map((metric) => (
               <MetricCard key={metric.title} metric={metric} />
             ))}
