@@ -1,7 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
 import {
-  LineChart,
-  Line,
   AreaChart,
   Area,
   BarChart,
@@ -27,7 +25,6 @@ import MetricCard from "./MetricCard";
 import AlertCard from "./AlertCard";
 import RecommendationCard from "./RecommendationCard";
 import type { Brand, DashboardData, ConversationItem } from "../types";
-import { allBrandsData } from "../data/mockData";
 import { LoaderIcon } from "./icons";
 
 interface DashboardProps {
@@ -35,6 +32,9 @@ interface DashboardProps {
   onAiPrompt: (prompt: string, brand: Brand) => void;
   isAiLoading: boolean;
   aiConversation: ConversationItem[];
+  data?: DashboardData; // Optional to handle loading states
+  isDataLoading?: boolean;
+  onRefreshData?: () => void;
 }
 
 const Dashboard: React.FC<DashboardProps> = ({
@@ -42,6 +42,9 @@ const Dashboard: React.FC<DashboardProps> = ({
   onAiPrompt,
   isAiLoading,
   aiConversation,
+  data,
+  isDataLoading = false,
+  onRefreshData,
 }) => {
   const [prompt, setPrompt] = useState("");
   const [selectedDateRange, setSelectedDateRange] = useState("Last 30 Days");
@@ -69,7 +72,7 @@ const Dashboard: React.FC<DashboardProps> = ({
     "Show me the most engaged demographic",
   ];
 
-  const brandData = allBrandsData[selectedBrand];
+  // Note: brandData will be passed via props from parent component
 
   const handlePromptSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -77,7 +80,20 @@ const Dashboard: React.FC<DashboardProps> = ({
     onAiPrompt(prompt, selectedBrand);
   };
 
-  const OverviewContent = ({ data }: { data: DashboardData }) => {
+  const OverviewContent = ({ data, isLoading }: { data?: DashboardData; isLoading?: boolean }) => {
+    // Show loading spinner when data is loading
+    if (isLoading || !data) {
+      return (
+        <div className="space-y-6">
+          <div className="bg-white p-6 rounded-xl shadow-sm">
+            <div className="flex items-center justify-center h-64">
+              <div className="w-12 h-12 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin"></div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     const dateRanges = [
       "Last 7 Days",
       "Last 30 Days",
@@ -87,13 +103,13 @@ const Dashboard: React.FC<DashboardProps> = ({
       "This Year",
     ];
 
-    const renderCustomizedLegend = (props: { payload?: any[] }) => {
+    const renderCustomizedLegend = (props: any) => {
       const { payload } = props;
       if (!payload) return null;
 
       return (
         <ul className="list-none p-0 m-0 flex flex-col gap-3 justify-center h-full">
-          {payload.map((entry, index) => (
+          {payload.map((entry: any, index: number) => (
             <li key={`item-${index}`} className="flex items-center">
               <span
                 className="w-3 h-3 rounded-full mr-3"
@@ -111,10 +127,38 @@ const Dashboard: React.FC<DashboardProps> = ({
       );
     };
 
+    if (isLoading) {
+      return (
+        <div className="space-y-6">
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-100 p-8 rounded-xl shadow-sm border border-blue-200">
+            <div className="flex flex-col items-center justify-center h-64 space-y-4">
+              <div className="relative">
+                <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+                <div className="absolute inset-2 w-8 h-8 border-4 border-transparent border-t-blue-400 rounded-full animate-spin animation-delay-150"></div>
+              </div>
+              <div className="text-center">
+                <h3 className="text-xl font-semibold text-blue-800 mb-2">
+                  Loading {selectedBrand} Data
+                </h3>
+                <p className="text-blue-600 text-sm">
+                  Fetching real-time campaign metrics from Supabase...
+                </p>
+                <div className="mt-4 flex items-center justify-center space-x-1">
+                  <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce"></div>
+                  <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce animation-delay-100"></div>
+                  <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce animation-delay-200"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className="space-y-6">
         <div
-          className="bg-white p-6 rounded-xl shadow-sm"
+          className="bg-white border border-gray-200 p-6 rounded-xl shadow-sm"
           title="A high-level overview of the most important marketing metrics."
         >
           <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
@@ -164,9 +208,13 @@ const Dashboard: React.FC<DashboardProps> = ({
               <button className="p-2 border rounded-md bg-white hover:bg-gray-50">
                 <DownloadIcon className="w-5 h-5 text-gray-600" />
               </button>
-              <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700">
-                <RefreshCwIcon className="w-4 h-4" />
-                <span>Refresh Data</span>
+              <button 
+                onClick={onRefreshData}
+                disabled={isDataLoading}
+                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed"
+              >
+                <RefreshCwIcon className={`w-4 h-4 ${isDataLoading ? 'animate-spin' : ''}`} />
+                <span>{isDataLoading ? 'Refreshing...' : 'Refresh Data'}</span>
               </button>
             </div>
           </div>
@@ -183,9 +231,13 @@ const Dashboard: React.FC<DashboardProps> = ({
               </a>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {data.alerts.map((alert) => (
+              {data.alerts?.map((alert) => (
                 <AlertCard key={alert.id} alert={alert} />
-              ))}
+              )) || (
+                <div className="col-span-2 text-center text-gray-500 py-4">
+                  No alerts available
+                </div>
+              )}
             </div>
           </div>
           <div title="AI-generated recommendations and next steps." className="mt-8">
@@ -201,28 +253,32 @@ const Dashboard: React.FC<DashboardProps> = ({
               </a>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {data.recommendations.map((recommendation, index) => (
+              {data.recommendations?.map((recommendation, index) => (
                 <RecommendationCard
                   key={index}
                   recommendation={recommendation}
                 />
-              ))}
+              )) || (
+                <div className="col-span-2 text-center text-gray-500 py-4">
+                  No recommendations available
+                </div>
+              )}
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
-            {data.executiveMetrics.map((metric) => (
+            {data.executiveMetrics?.map((metric) => (
               <MetricCard key={metric.title} metric={metric} />
             ))}
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
-            {data.secondaryMetrics.map((metric) => (
+            {data.secondaryMetrics?.map((metric) => (
               <MetricCard key={metric.title} metric={metric} />
             ))}
           </div>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
           <div
-            className="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm"
+            className="lg:col-span-2 bg-white border border-gray-200 p-6 rounded-xl shadow-sm"
             title="A breakdown of total revenue generated by each marketing channel."
           >
             <div className="flex items-start justify-between">
@@ -235,7 +291,7 @@ const Dashboard: React.FC<DashboardProps> = ({
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
-                    data={data.revenueByChannelData}
+                    data={data.revenueByChannelData || []}
                     dataKey="value"
                     nameKey="name"
                     cx="50%"
@@ -245,7 +301,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                     fill="#8884d8"
                     paddingAngle={5}
                   >
-                    {data.revenueByChannelData.map((entry, index) => (
+                    {(data.revenueByChannelData || []).map((entry, index) => (
                       <Cell
                         key={`cell-${index}`}
                         fill={entry.color}
@@ -290,7 +346,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                 </div> */}
         </div>
         <div
-          className="bg-white p-6 rounded-xl shadow-sm"
+          className="bg-white border border-gray-200 p-6 rounded-xl shadow-sm"
           title="Paid advertising campaigns overview."
         >
           <div className="flex justify-between items-center mb-4">
@@ -332,30 +388,38 @@ const Dashboard: React.FC<DashboardProps> = ({
                 </tr>
               </thead>
               <tbody>
-                {data.topCampaigns.map((c, i) => (
-                  <tr key={i} className="bg-white border-b hover:bg-gray-50">
-                    <th
-                      scope="row"
-                      className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
-                    >
-                      {c.name}
-                    </th>
-                    <td className="px-6 py-4">{c.platform}</td>
-                    <td className="px-6 py-4">{c.spend}</td>
-                    <td className="px-6 py-4">{c.revenue}</td>
-                    <td className="px-6 py-4 font-semibold text-green-600">
-                      {c.roas}
+                {data.topCampaigns?.length > 0 ? (
+                  data.topCampaigns.map((c, i) => (
+                    <tr key={i} className="bg-white border-b hover:bg-gray-50">
+                      <th
+                        scope="row"
+                        className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
+                      >
+                        {c.name}
+                      </th>
+                      <td className="px-6 py-4">{c.platform}</td>
+                      <td className="px-6 py-4">{c.spend}</td>
+                      <td className="px-6 py-4">{c.revenue}</td>
+                      <td className="px-6 py-4 font-semibold text-green-600">
+                        {c.roas}
+                      </td>
+                      <td className="px-6 py-4">{c.cpa}</td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
+                      No campaign data available
                     </td>
-                    <td className="px-6 py-4">{c.cpa}</td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </table>
           </div>
         </div>
 
         {/* Social Media Competition */}
-        <div className="bg-white p-6 rounded-xl shadow-sm">
+        <div className="bg-white border border-gray-200 p-6 rounded-xl shadow-sm">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-bold text-gray-800">
               Social Media Competition
@@ -369,7 +433,7 @@ const Dashboard: React.FC<DashboardProps> = ({
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            {data.socialMediaCompetitionMetrics.map((metric) => (
+            {data.socialMediaCompetitionMetrics?.map((metric) => (
               <MetricCard key={metric.title} metric={metric} />
             ))}
           </div>
@@ -377,7 +441,7 @@ const Dashboard: React.FC<DashboardProps> = ({
           {/* Share of Voice Bar Chart */}
           <div className="h-64 mt-6">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={data.socialMediaCompetitionChart}>
+              <BarChart data={data.socialMediaCompetitionChart || []}>
                 <XAxis dataKey="competitor" stroke="#9ca3af" />
                 <YAxis stroke="#9ca3af" />
                 <Tooltip />
@@ -394,7 +458,7 @@ const Dashboard: React.FC<DashboardProps> = ({
         </div>
 
         {/* Social Media Content Performance */}
-        <div className="bg-white p-6 rounded-xl shadow-sm">
+        <div className="bg-white border border-gray-200 p-6 rounded-xl shadow-sm">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-bold text-gray-800">
               Social Media Content Performance
@@ -408,20 +472,19 @@ const Dashboard: React.FC<DashboardProps> = ({
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            {data.socialMediaContentPerformanceMetrics.map((metric) => (
+            {data.socialMediaContentPerformanceMetrics?.map((metric) => (
               <MetricCard key={metric.title} metric={metric} />
             ))}
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Top Posts by Engagement */}
+            {/* Campaign Objectives Performance */}
             <div className="h-64">
+              <h4 className="text-sm font-semibold text-gray-700 mb-3">Performance by Campaign Objective</h4>
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={data.topPosts}>
-                  {/* <XAxis dataKey="title" stroke="#9ca3af" />
-                            <YAxis stroke="#9ca3af" /> */}
+                <BarChart data={data.campaignObjectiveData || []}>
                   <XAxis
-                    dataKey="title"
+                    dataKey="objective"
                     stroke="#9ca3af"
                     tick={{ fontSize: 10, fill: "#374151", dy: 10 }}
                   />
@@ -430,23 +493,24 @@ const Dashboard: React.FC<DashboardProps> = ({
                     tick={{ fontSize: 12, fill: "#374151" }}
                   />
                   <Tooltip />
-                  <Bar dataKey="engagement" fill="#6366f1" />
+                  <Bar dataKey="spend" fill="#3b82f6" />
                 </BarChart>
               </ResponsiveContainer>
             </div>
 
-            {/* Video Completion Trend */}
+            {/* Monthly Spend Trend */}
             <div className="h-64">
+              <h4 className="text-sm font-semibold text-gray-700 mb-3">Monthly Spend Trend</h4>
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={data.videoCompletionTrend}>
-                  <XAxis dataKey="date" stroke="#9ca3af" />
+                <AreaChart data={data.monthlySpendData || []}>
+                  <XAxis dataKey="month" stroke="#9ca3af" />
                   <YAxis stroke="#9ca3af" />
                   <Tooltip />
                   <Area
                     type="monotone"
-                    dataKey="completionRate"
-                    stroke="#f43f5e"
-                    fill="#f43f5e20"
+                    dataKey="spend"
+                    stroke="#10b981"
+                    fill="#10b98120"
                   />
                 </AreaChart>
               </ResponsiveContainer>
@@ -455,7 +519,7 @@ const Dashboard: React.FC<DashboardProps> = ({
         </div>
 
         {/* Social Listening Metrics */}
-        <div className="bg-white p-6 rounded-xl shadow-sm">
+        <div className="bg-white border border-gray-200 p-6 rounded-xl shadow-sm">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-bold text-gray-800">
               Social Listening Metrics
@@ -469,40 +533,40 @@ const Dashboard: React.FC<DashboardProps> = ({
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            {data.socialListeningMetrics.map((metric) => (
+            {data.socialListeningMetrics?.map((metric) => (
               <MetricCard key={metric.title} metric={metric} />
             ))}
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Trending Hashtags as Bar Size */}
+            {/* Top Performing Products */}
             <div className="h-64">
+              <h4 className="text-sm font-semibold text-gray-700 mb-3">Top Performing Products</h4>
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={data.trendingHashtags}>
+                <BarChart data={data.productPerformanceData || []}>
                   <XAxis
-                    dataKey="hashtag"
+                    dataKey="product"
                     stroke="#9ca3af"
                     tick={{ fontSize: 10, fill: "#374151", dy: 10 }}
                   />
                   <YAxis stroke="#9ca3af" />
                   <Tooltip />
-                  <Bar dataKey="mentions" fill="#f59e0b" />
+                  <Bar dataKey="leads" fill="#f59e0b" />
                 </BarChart>
               </ResponsiveContainer>
             </div>
 
-            {/* Sentiment Trend */}
+            {/* Campaign Funnel Performance */}
             <div className="h-64">
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={data.sentimentTrend}>
-                  <XAxis dataKey="week" stroke="#9ca3af" />
+              <h4 className="text-sm font-semibold text-gray-700 mb-3">Campaign Funnel Performance</h4>
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={data.funnelPerformanceData || []}>
+                  <XAxis dataKey="funnel" stroke="#9ca3af" />
                   <YAxis stroke="#9ca3af" />
                   <Tooltip />
-                  <Legend />
-                  <Line type="monotone" dataKey="positive" stroke="#10b981" />
-                  <Line type="monotone" dataKey="neutral" stroke="#3b82f6" />
-                  <Line type="monotone" dataKey="negative" stroke="#ef4444" />
-                </LineChart>
+                  <Bar dataKey="campaigns" fill="#8b5cf6" />
+                  <Bar dataKey="avgSpend" fill="#ec4899" />
+                </BarChart>
               </ResponsiveContainer>
             </div>
           </div>
@@ -514,7 +578,7 @@ const Dashboard: React.FC<DashboardProps> = ({
   return (
     <div className="space-y-6">
       <div
-        className="bg-white p-6 rounded-xl shadow-sm"
+        className={`p-6 rounded-xl shadow-sm ${data ? 'bg-white border border-gray-200' : 'bg-gray-50 border-2 border-gray-200'}`}
         title="Use the AI-powered search to ask questions about your marketing data."
       >
         <h1 className="text-3xl font-bold text-gray-800">
@@ -560,7 +624,7 @@ const Dashboard: React.FC<DashboardProps> = ({
         </div>
       </div>
 
-      <OverviewContent data={brandData} />
+      <OverviewContent data={data} isLoading={isDataLoading} />
     </div>
   );
 };

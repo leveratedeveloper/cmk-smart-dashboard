@@ -1,0 +1,31 @@
+/* Custom loading animation delays */
+.animation-delay-100 {
+  animation-delay: 0.1s;
+}
+
+.animation-delay-150 {
+  animation-delay: 0.15s;
+}
+
+.animation-delay-200 {
+  animation-delay: 0.2s;
+}
+
+/* Enhanced border width for loading spinner */
+.border-3 {
+  border-width: 3px;
+}
+
+/* Pulsing animation for loading states */
+@keyframes pulse-blue {
+  0%, 100% {
+    background-color: rgb(59 130 246);
+  }
+  50% {
+    background-color: rgb(147 197 253);
+  }
+}
+
+.animate-pulse-blue {
+  animation: pulse-blue 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
